@@ -25,7 +25,27 @@ const validateNoExtraFields = (body, allowedFields) => {
   }
 }
 
+const validateEmail = (email) => {
+  if (!EMAIL_REGEX.test(email)) {
+    throw new ValidationError("Email must be a valid gmail address");
+  }
+}
 
+const validatePhone = (phone) => {
+  if (!PHONE_REGEX.test(phone)) {
+    throw new ValidationError("Invalid phone number format");
+  }
+}
+
+const validatePassword = (password) => {
+  if (typeof password !== "string" || password.length < 4) {
+    throw new ValidationError("Password must be a string with a minimum length of 4 characters.");
+  }
+
+  if (!PASSWORD_REGEX.test(password)) {
+    throw new ValidationError("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
+  }
+}
 
 
 const handleValidationError = (error, res) => {
@@ -52,28 +72,16 @@ const createUserValid = (req, res, next) => {
     const allowedFields = Object.keys(USER).filter(key => key !== "id");
     const requiredFields = allowedFields;
 
+    // Completeness validation
     validateRequiredFields(req.body, requiredFields);
-
     validateNoExtraFields(req.body, allowedFields);
 
-    if (!EMAIL_REGEX.test(email)) {
-      throw new ValidationError("Email must be a valid gmail address");
-    }
-
-    if (!PHONE_REGEX.test(phone)) {
-      throw new ValidationError("Invalid phone number format");
-    }
-
-    if (typeof password !== "string" || password.length < 4) {
-      throw new ValidationError("Password must be a string at least 4 characters long");
-    }
-
-    if (!PASSWORD_REGEX.test(password)) {
-      throw new ValidationError("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
-    }
+    // Attributes validation
+    validateEmail(email);
+    validatePhone(phone);
+    validatePassword(password);
 
     next();
-
   } catch (error) {
     handleValidationError(error, res);
   }
@@ -91,27 +99,11 @@ const updateUserValid = (req, res, next) => {
       throw new ValidationError("The request body must include at least one valid field to update.")
     }
 
-    if (req.body.email && !EMAIL_REGEX.test(req.body.email)) {
-      throw new ValidationError("Email must be a valid gmail address");
-    }
-
-    if (req.body.phone && !PHONE_REGEX.test(req.body.phone)) {
-      throw new ValidationError("Invalid phone number format");
-    }
-
-    if (req.body.password) {
-      const password = req.body.password
-        if (typeof password !== "string" || password.length < 4) {
-        throw new ValidationError("Password must be a string with a minimum length of 4 characters.");
-      }
-
-      if (!PASSWORD_REGEX.test(password)) {
-        throw new ValidationError("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
-      }
-    }
+    if (req.body.email) validateEmail(req.body.email);
+    if (req.body.phone) validatePhone(req.body.phone);
+    if (req.body.password) validatePassword(req.body.password);
 
     next();
-
   } catch (error) {
     handleValidationError(error, res);
   }
