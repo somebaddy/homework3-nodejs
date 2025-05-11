@@ -12,7 +12,7 @@ const validateNoIdFieldInBody = (body) => {
 }
 
 const validateRequiredFields = (body, requiredFields) => {
-  const missingFields = requiredFields.filter(field => !body[field]);
+  const missingFields = requiredFields.filter(field => body[field] === undefined);
   if (missingFields.length > 0) {
     throw new ValidationError(`Required fields '${missingFields.join("', '")}' are missing`);
   }
