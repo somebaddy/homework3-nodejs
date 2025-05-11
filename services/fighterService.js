@@ -1,4 +1,5 @@
 import { fighterRepository } from "../repositories/fighterRepository.js";
+import { Error400 } from "../helpers/errors.js";
 
 class FighterService {
   // TODO: Implement methods to work with fighters
@@ -11,6 +12,10 @@ class FighterService {
   }
 
   createFighter(fighter) {
+    const existingName = fighterRepository.getOne({name: fighter.name});
+    if (existingName) {
+      throw new Error400("Fighter name already registered.")
+    }
     return fighterRepository.create(fighter);
   }
 
