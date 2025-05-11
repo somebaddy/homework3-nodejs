@@ -5,57 +5,26 @@ import {
   updateUserValid,
 } from "../middlewares/user.validation.middleware.js";
 import { responseMiddleware } from "../middlewares/response.middleware.js";
+import { wrapRequest } from "./requestHelpers.js";
 
 const router = Router();
 
 // OPTIONAL TODO: Implement route controller for fights
-router.get("/", (req, res, next) => {
-  console.log("Fights");
-  try {
-    const data = fightsService.getFights();
-    res.data = data;
-  } catch (err) {
-    res.err = err;
-  } finally {
-    next();
-  }
-}, responseMiddleware);
 
-router.get("/:id", (req, res, next) => {
-  console.log("Fight");
-  try {
-    const data = fightsService.getFight(req.params.id);
-    res.data = data;
-  } catch (err) {
-    res.err = err;
-  } finally {
-    next();
-  }
-}, responseMiddleware);
+router.get("/", 
+  wrapRequest((req) => fightsService.getFights())
+, responseMiddleware);
 
-router.post("/", (req, res, next) => {
-  console.log("Create Fight");
-  try {
-    const data = fightsService.createFight(req.body);
-    res.data = data;
-  } catch (err) {
-    res.err = err;
-  } finally {
-    next();
-  }
-}, responseMiddleware);
+router.get("/:id", 
+  wrapRequest((req) => fightsService.getFight(req.params.id))
+, responseMiddleware);
 
-router.delete("/:id", (req, res, next) => {
-  console.log("Delete Fight");
-  try {
-    const data = fightsService.deleteFight(req.params.id);
-    res.data = data;
-  } catch (err) {
-    res.err = err;
-  } finally {
-    next();
-  }
-}, responseMiddleware);
- 
+router.post("/", 
+  wrapRequest((req) => fightsService.createFight(req.body))
+, responseMiddleware);
+
+router.delete("/:id", 
+  wrapRequest((req) => fightsService.deleteFight(req.params.id))
+, responseMiddleware); 
 
 export { router };
