@@ -1,3 +1,4 @@
+import { Error400 } from "../helpers/errors.js";
 import { userRepository } from "../repositories/userRepository.js";
 
 class UserService {
@@ -13,11 +14,11 @@ class UserService {
   createUser(user) {
     const existingEmail = userRepository.getOne({email: user.email});
     if (existingEmail) {
-      throw new Error("User with this email already exists");
+      throw new Error400("User with this email already exists");
     }
     const existingPhone = userRepository.getOne({phone: user.phone});
     if (existingPhone) {
-      throw new Error("User phone number already registered")
+      throw new Error400("User phone number already registered")
     }
 
     return userRepository.create(user); 
