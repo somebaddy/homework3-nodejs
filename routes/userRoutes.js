@@ -5,81 +5,28 @@ import {
   updateUserValid,
 } from "../middlewares/user.validation.middleware.js";
 import { responseMiddleware } from "../middlewares/response.middleware.js";
+import { wrapRequest } from "./requestHelpers.js";
 
 const router = Router();
 
-// TODO: Implement route controllers for user
-router.get('/', (req, res, next) => {
-  console.log('Users');
-  try {
-    const data = userService.getUsers();
-    res.data = data;
-  } catch (err) {
-    res.err = err;
-  } finally {
-    next();
-  }
-}, responseMiddleware);
+router.get('/', 
+  wrapRequest((req) => userService.getUsers())
+, responseMiddleware);
 
+router.get('/:id', 
+  wrapRequest((req) => userService.getUser(req.params.id))
+, responseMiddleware);
 
-router.get('/:id', (req, res, next) => {
-  console.log('User');
-  try {
-    const data = userService.getUser(req.params.id);
-    res.data = data;
-  }
-  catch (err) {
-    res.err = err;
-  }
-  finally {
-    next();
-  }
-}, responseMiddleware);
+router.post('/', createUserValid,
+  wrapRequest((req) => userService.createUser(req.body))
+, responseMiddleware);
 
+router.patch('/:id', updateUserValid,
+  wrapRequest((req) => userService.updateUser(req.params.id, req.body))
+, responseMiddleware);
 
-router.post('/', createUserValid, (req, res, next) => {
-  console.log('Create User');
-  try {
-    const data = userService.createUser(req.body);
-    res.data = data;
-    }
-  catch (err) {
-    res.err = err;
-  }
-  finally {
-    next();
-    }
-}, responseMiddleware);
-
-
-router.patch('/:id', updateUserValid, (req, res, next) => {
-  console.log('Update User');
-  try {
-    const data = userService.updateUser(req.params.id, req.body);
-    res.data = data;
-  }
-  catch (err) {
-    res.err = err;
-  }
-  finally {
-    next();
-  }
-}, responseMiddleware);
-
-
-router.delete('/:id', (req, res, next) => {
-  console.log('Delete User');
-  try {
-    const data = userService.deleteUser(req.params.id);
-    res.data = data;
-  }
-  catch (err) {
-    res.err = err;
-  }
-  finally {
-    next();
-  }
-}, responseMiddleware);
-
+router.delete('/:id',
+  wrapRequest((req) => userService.deleteUser(req.params.id))
+, responseMiddleware);
 
 export { router };
