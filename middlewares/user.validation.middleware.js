@@ -1,6 +1,18 @@
 import { ValidationError } from "../helpers/errors.js";
 import { USER } from "../models/user.js";
 
+const handleValidationError = (error, res) => {
+  if (error instanceof ValidationError) {
+    const { message, code } = error;
+    res.status(code).json({
+      error: true,
+      message
+    })
+    return;
+  } else {
+    throw error;
+  }
+}
 
 const createUserValid = (req, res, next) => {
   try {
@@ -49,16 +61,7 @@ const createUserValid = (req, res, next) => {
     next();
 
   } catch (error) {
-    if (error instanceof ValidationError) {
-      const { message, code } = error;
-      res.status(code).json({
-        error: true,
-        message
-      })
-      return;
-    } else {
-      throw error;
-    }
+    handleValidationError(error, res);
   }
 };
 
@@ -82,16 +85,7 @@ const updateUserValid = (req, res, next) => {
     next();
 
   } catch (error) {
-    if (error instanceof ValidationError) {
-      const { message, code } = error;
-      res.status(code).json({
-        error: true,
-        message
-      })
-      return;
-    } else {
-      throw error;
-    }
+    handleValidationError(error, res);
   }
 };
 
