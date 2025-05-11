@@ -13,6 +13,10 @@ class FightsService {
   createFight(fight) {
     return fightRepository.create(fight);
   }
+
+  deleteFight(id) {
+    return fightRepository.delete(id);
+  }
 }
 
 const fightsService = new FightsService();

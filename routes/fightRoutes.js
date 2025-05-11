@@ -44,6 +44,18 @@ router.post("/", (req, res, next) => {
     next();
   }
 }, responseMiddleware);
+
+router.delete("/:id", (req, res, next) => {
+  console.log("Delete Fight");
+  try {
+    const data = fightsService.deleteFight(req.params.id);
+    res.data = data;
+  } catch (err) {
+    res.err = err;
+  } finally {
+    next();
+  }
+}, responseMiddleware);
  
 
 export { router };
