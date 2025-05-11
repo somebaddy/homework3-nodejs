@@ -6,6 +6,22 @@ class UserService {
     return userRepository.getAll();
   }
 
+  getUser(id) {
+    return userRepository.getOne({ id });
+  }
+
+  createUser(user) {
+    return userRepository.create(user);
+  }
+
+  updateUser(id, user) {
+    return userRepository.update(id, user);
+  }
+
+  deleteUser(id) {
+    return userRepository.delete(id); 
+  }
+
   search(search) {
     const item = userRepository.getOne(search);
     if (!item) {
