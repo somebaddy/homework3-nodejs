@@ -1,6 +1,10 @@
 import { ValidationError } from "../helpers/errors.js";
 import { USER } from "../models/user.js";
 
+const EMAIL_REGEX = /^[^\s@]+@gmail\.com$/;
+const PHONE_REGEX = /^\+380\d{9}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{4,}$/;
+
 const validateNoIdFieldInBody = (body) => {
   if (body.id) {
     throw new ValidationError("ID is not allowed");
@@ -20,6 +24,8 @@ const validateNoExtraFields = (body, allowedFields) => {
     throw new ValidationError(`Unexpected fields '${extraFields.join("', '")}'`);
   }
 }
+
+
 
 
 const handleValidationError = (error, res) => {
@@ -50,13 +56,11 @@ const createUserValid = (req, res, next) => {
 
     validateNoExtraFields(req.body, allowedFields);
 
-    const emailRegex = /^[^\s@]+@gmail\.com$/;
-    if (!emailRegex.test(email)) {
+    if (!EMAIL_REGEX.test(email)) {
       throw new ValidationError("Email must be a valid gmail address");
     }
 
-    const phoneRegex = /^\+380\d{9}$/;
-    if (!phoneRegex.test(phone)) {
+    if (!PHONE_REGEX.test(phone)) {
       throw new ValidationError("Invalid phone number format");
     }
 
@@ -64,8 +68,7 @@ const createUserValid = (req, res, next) => {
       throw new ValidationError("Password must be a string at least 4 characters long");
     }
 
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{4,}$/;
-    if (!passwordRegex.test(password)) {
+    if (!PASSWORD_REGEX.test(password)) {
       throw new ValidationError("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
     }
 
@@ -85,27 +88,24 @@ const updateUserValid = (req, res, next) => {
 
     const providedFields = Object.keys(req.body);
     if (providedFields.length === 0) {
-      throw new ValidationError("Request body must contain at least one field to update.")
+      throw new ValidationError("The request body must include at least one valid field to update.")
     }
 
-    const emailRegex = /^[^\s@]+@gmail\.com$/;
-    if (req.body.email && !emailRegex.test(req.body.email)) {
+    if (req.body.email && !EMAIL_REGEX.test(req.body.email)) {
       throw new ValidationError("Email must be a valid gmail address");
     }
 
-    const phoneRegex = /^\+380\d{9}$/;
-    if (req.body.phone && !phoneRegex.test(req.body.phone)) {
+    if (req.body.phone && !PHONE_REGEX.test(req.body.phone)) {
       throw new ValidationError("Invalid phone number format");
     }
 
     if (req.body.password) {
       const password = req.body.password
         if (typeof password !== "string" || password.length < 4) {
-        throw new ValidationError("Password must be a string at least 4 characters long");
+        throw new ValidationError("Password must be a string with a minimum length of 4 characters.");
       }
 
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{4,}$/;
-      if (!passwordRegex.test(password)) {
+      if (!PASSWORD_REGEX.test(password)) {
         throw new ValidationError("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
       }
     }
