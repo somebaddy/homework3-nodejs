@@ -88,6 +88,28 @@ const updateUserValid = (req, res, next) => {
       throw new ValidationError("Request body must contain at least one field to update.")
     }
 
+    const emailRegex = /^[^\s@]+@gmail\.com$/;
+    if (req.body.email && !emailRegex.test(req.body.email)) {
+      throw new ValidationError("Email must be a valid gmail address");
+    }
+
+    const phoneRegex = /^\+380\d{9}$/;
+    if (req.body.phone && !phoneRegex.test(req.body.phone)) {
+      throw new ValidationError("Invalid phone number format");
+    }
+
+    if (req.body.password) {
+      const password = req.body.password
+        if (typeof password !== "string" || password.length < 4) {
+        throw new ValidationError("Password must be a string at least 4 characters long");
+      }
+
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{4,}$/;
+      if (!passwordRegex.test(password)) {
+        throw new ValidationError("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
+      }
+    }
+
     next();
 
   } catch (error) {
