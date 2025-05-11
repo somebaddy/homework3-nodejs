@@ -1,9 +1,6 @@
 import { Router } from "express";
 import { fightsService } from "../services/fightService.js";
-import {
-  createUserValid,
-  updateUserValid,
-} from "../middlewares/user.validation.middleware.js";
+import { createFightValid } from "../middlewares/fight.validation.middleware.js";
 import { responseMiddleware } from "../middlewares/response.middleware.js";
 import { wrapRequest } from "./requestHelpers.js";
 
@@ -19,7 +16,7 @@ router.get("/:id",
   wrapRequest((req) => fightsService.getFight(req.params.id))
 , responseMiddleware);
 
-router.post("/", 
+router.post("/", createFightValid,
   wrapRequest((req) => fightsService.createFight(req.body))
 , responseMiddleware);
 
