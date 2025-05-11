@@ -3,11 +3,10 @@ import { USER } from "../models/user.js";
 
 
 const createUserValid = (req, res, next) => {
-  const { firstName, lastName, email, phone, password } = req.body;
-
   try {
-    // Separate "id" validation due specification
+    const { firstName, lastName, email, phone, password } = req.body;
 
+    // Separate "id" validation due specification
     if (req.body.id) {
       throw new ValidationError("ID is not allowed");
     }
@@ -64,33 +63,36 @@ const createUserValid = (req, res, next) => {
 };
 
 const updateUserValid = (req, res, next) => {
-  // Separate "id" validation due specification
-  if (req.body.id) {
-    res.status(400).json({
-      error: true,
-      message: "ID is not allowed"
-    });
-    return;
+  try {
+    if (req.body.id) {
+      throw new ValidationError("ID is not allowed");
+    }
+
+    const providedFields = Object.keys(req.body);
+    const allowedFieldsSet = new Set(Object.keys(USER));
+
+    if (providedFields.some(field => !allowedFieldsSet.has(field))) {
+      throw new ValidationError("Request body contains fields not present in the user model.");
+    }
+
+    if (providedFields.length === 0) {
+      throw new ValidationError("Request body must contain at least one field from the user model.")
+    }
+
+    next();
+
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      const { message, code } = error;
+      res.status(code).json({
+        error: true,
+        message
+      })
+      return;
+    } else {
+      throw error;
+    }
   }
-
-  const allowedFields = Object.keys(USER);
-  const providedFields = Object.keys(req.body);
-
-  if (providedFields.some(field => !allowedFields.includes(field))) {
-    return res.status(400).json({
-      error: true,
-      message: "Request body contains fields not present in the user model.",
-    });
-  }
-
-  if (providedFields.length === 0) {
-    return res.status(400).json({
-      error: true,
-      message: "Request body must contain at least one field from the user model.",
-    });
-  }
-
-  next();
 };
 
 export { createUserValid, updateUserValid };
