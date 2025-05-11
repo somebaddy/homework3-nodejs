@@ -12,10 +12,11 @@ class UserService {
   }
 
   createUser(user) {
-    const existingEmail = userRepository.getOne({email: user.email});
+    const existingEmail = userRepository.getOne(it => it.email.toLowerCase() === user.email.toLowerCase());
     if (existingEmail) {
       throw new Error400("User with this email already exists");
     }
+
     const existingPhone = userRepository.getOne({phone: user.phone});
     if (existingPhone) {
       throw new Error400("User phone number already registered")

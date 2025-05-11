@@ -12,7 +12,7 @@ class FighterService {
   }
 
   createFighter(fighter) {
-    const existingName = fighterRepository.getOne({name: fighter.name});
+    const existingName = fighterRepository.getOne(it => it.name.toLowerCase() === fighter.name.toLowerCase());
     if (existingName) {
       throw new Error400("Fighter name already registered.")
     }
