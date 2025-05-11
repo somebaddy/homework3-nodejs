@@ -1,20 +1,8 @@
 import { ValidationError } from "../helpers/errors.js";
 import { USER } from "../models/user.js";
 import { validateEmail, validateNoExtraFields, validateNoIdFieldInBody, validatePassword, validatePhone, validateRequiredFields } from "./validators.js";
+import { handleValidationError } from "./helpers.js";
 
-
-const handleValidationError = (error, res) => {
-  if (error instanceof ValidationError) {
-    const { message, code } = error;
-    res.status(code).json({
-      error: true,
-      message
-    })
-    return;
-  } else {
-    throw error;
-  }
-}
 
 const createUserValid = (req, res, next) => {
   try {
