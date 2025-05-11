@@ -35,10 +35,15 @@ class Error500 extends Error {
     }
 }
 
+class ValidationError extends Error400 {
+
+}
+
 
 export {
     Error400,
     Error401,
     Error404,
-    Error500
+    Error500,
+    ValidationError
 };

@@ -1,74 +1,66 @@
+import { ValidationError } from "../helpers/errors.js";
 import { USER } from "../models/user.js";
+
 
 const createUserValid = (req, res, next) => {
   const { firstName, lastName, email, phone, password } = req.body;
 
-  // Separate "id" validation due specification
-  if (req.body.id) {
-    res.status(400).json({ error: true, message: "ID is not allowed" });
-    return;
+  try {
+    // Separate "id" validation due specification
+
+    if (req.body.id) {
+      throw new ValidationError("ID is not allowed");
+    }
+
+    // Due specification no extra data allowed and all field are required
+    const allowedFields = Object.keys(USER).filter(key => key !== "id");
+    const requiredFields = allowedFields;
+
+    const missingFields = requiredFields.filter(field => !req.body[field]);
+
+    if (missingFields.length > 0) {
+      throw new ValidationError(`Required fields '${missingFields.join("', '")}' are missing`);
+    }
+
+    const extraFields = Object.keys(req.body).filter(field => !allowedFields.includes(field));
+
+    if (extraFields.length > 0) {
+      throw new ValidationError(`Unexpected fields: '${extraFields.join("', '")}'`);
+    }
+
+    const emailRegex = /^[^\s@]+@gmail\.com$/;
+    if (!emailRegex.test(email)) {
+      throw new ValidationError("Email must be a valid gmail address");
+    }
+
+    const phoneRegex = /^\+380\d{9}$/;
+    if (!phoneRegex.test(phone)) {
+      throw new ValidationError("Invalid phone number format");
+    }
+
+    if (typeof password !== "string" || password.length < 4) {
+      throw new ValidationError("Password must be a string at least 4 characters long");
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{4,}$/;
+    if (!passwordRegex.test(password)) {
+      throw new ValidationError("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
+    }
+
+    next();
+
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      const { message, code } = error;
+      res.status(code).json({
+        error: true,
+        message
+      })
+      return;
+    } else {
+      throw error;
+    }
   }
-
-  // Due specification no extra data allowed and all field are required
-  const allowedFields = Object.keys(USER).filter(key => key !== "id");
-  const requiredFields = allowedFields;
-
-  const missingFields = requiredFields.filter(field => !req.body[field]);
-
-  if (missingFields.length > 0) {
-    res.status(400).json({
-      error: true,
-      message: `Required fields '${missingFields.join("', '")}' are missing`,
-    });
-    return;
-  }
-
-  const extraFields = Object.keys(req.body).filter(field => !allowedFields.includes(field));
-
-  if (extraFields.length > 0) {
-    res.status(400).json({
-      error: true,
-      message: `Unexpected fields: ${extraFields.join(", ")}`,
-    });
-    return;
-  }
-
-  const emailRegex = /^[^\s@]+@gmail\.com$/;
-  if (!emailRegex.test(email)) {
-    res.status(400).json({
-      error: true,
-      message: "Email must be a valid gmail address"
-    });
-    return;
-  }
-
-  const phoneRegex = /^\+380\d{9}$/;
-  if (!phoneRegex.test(phone)) {
-    res.status(400).json({
-      error: true,
-      message: "Invalid phone number format"
-    });
-    return;
-  }
-
-  if (typeof password !== "string" || password.length < 4) {
-    res.status(400).json({
-      error: true,
-      message: "Password must be a string at least 4 characters long"
-    });
-    return;
-  }
-
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{4,}$/;
-  if (!passwordRegex.test(password)) {
-    res.status(400).json({
-      error: true,
-      message: "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
-    });
-    return;
-  }
-
-  next();
 };
 
 const updateUserValid = (req, res, next) => {
