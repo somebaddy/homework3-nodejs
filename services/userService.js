@@ -1,4 +1,4 @@
-import { Error400 } from "../helpers/errors.js";
+import { Error400, Error404 } from "../helpers/errors.js";
 import { userRepository } from "../repositories/userRepository.js";
 
 class UserService {
@@ -26,11 +26,19 @@ class UserService {
   }
 
   updateUser(id, user) {
-    return userRepository.update(id, user);
+    const updatedUser = userRepository.update(id, user);
+    if (!updatedUser || !updatedUser.id) {
+      throw new Error404("User not found");
+    }
+    return updatedUser;
   }
 
   deleteUser(id) {
-    return userRepository.delete(id); 
+    const deletedUser = userRepository.delete(id);
+    if (!deletedUser || deletedUser.length === 0) {
+      throw new Error404("User not found");
+    }
+    return deletedUser; 
   }
 
   search(search) {

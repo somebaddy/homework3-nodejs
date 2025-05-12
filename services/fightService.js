@@ -1,3 +1,4 @@
+import { Error404 } from "../helpers/errors.js";
 import { fightRepository } from "../repositories/fightRepository.js";
 
 class FightsService {
@@ -15,7 +16,11 @@ class FightsService {
   }
 
   deleteFight(id) {
-    return fightRepository.delete(id);
+    const deletedFight = fightRepository.delete(id);
+    if (!deletedFight || deletedFight.length === 0) {
+      throw new Error404("Fight not found");
+    }
+    return deletedFight;
   }
 }
 

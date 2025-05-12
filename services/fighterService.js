@@ -1,5 +1,5 @@
 import { fighterRepository } from "../repositories/fighterRepository.js";
-import { Error400 } from "../helpers/errors.js";
+import { Error400, Error404 } from "../helpers/errors.js";
 
 class FighterService {
   // TODO: Implement methods to work with fighters
@@ -20,11 +20,19 @@ class FighterService {
   }
 
   updateFighter(id, fighter) {
-    return fighterRepository.update(id, fighter);
+    const updatedFighter = fighterRepository.update(id, fighter);
+    if (!updatedFighter || !updatedFighter.id) {
+      throw new Error404("Fighter not found");
+    }
+    return updatedFighter;
   }
 
   deleteFighter(id) {
-    return fighterRepository.delete(id);
+    const deletedFighter = fighterRepository.delete(id);
+    if (!deletedFighter || deletedFighter.length === 0) {
+      throw new Error404("Fighter not found");
+    } 
+    return deletedFighter;
   }
 }
 
