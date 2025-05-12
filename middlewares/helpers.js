@@ -1,16 +1,21 @@
 import { ValidationError } from "../helpers/errors.js";
 
+const setResponseError = (res, err) => {
+  let { message, code } = err;
+  code = code || 500;
+  message = message || "Unknown error. That's embarrassing."
+  res.status(code).json({
+    error: true,
+    message
+  })
+}
+
 const handleValidationError = (error, res) => {
   if (error instanceof ValidationError) {
-    const { message, code } = error;
-    res.status(code).json({
-      error: true,
-      message
-    })
-    return;
+    setResponseError(res, error);
   } else {
     throw error;
   }
 }
 
-export { handleValidationError };
+export { handleValidationError, setResponseError };
