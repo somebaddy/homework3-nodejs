@@ -16,7 +16,7 @@ router.get("/",
 , responseMiddleware);
 
 router.get("/:id", 
-  wrapRequest((req) => fighterService.getFighter(req.params.id))
+  wrapRequest((req) => { fighterService.getFighter(req.params.id) }, "Fighter not found.")
 , responseMiddleware);
 
 router.post("/", createFighterValid, 
