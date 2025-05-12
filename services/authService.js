@@ -1,13 +1,14 @@
+import { Error404 } from "../helpers/errors.js";
 import { userService } from "./userService.js";
 
 class AuthService {
   login(userData) {
     const user = userService.search(userData);
     if (!user) {
-      throw Error("User not found");
+      throw new Error404("User not found");
     }
     if (user.password !== userData.password) {
-      throw Error("Wrong password");
+      throw new Error404("Wrong password");
     }
     return user;
   }
