@@ -13,7 +13,7 @@ router.get("/",
 , responseMiddleware);
 
 router.get("/:id", 
-  wrapRequest((req) => { fightsService.getFight(req.params.id) }, "Fight not found.")
+  wrapRequest((req) => fightsService.getFight(req.params.id), "Fight not found.")
 , responseMiddleware);
 
 router.post("/", createFightValid,
