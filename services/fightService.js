@@ -1,4 +1,5 @@
 import { Error404 } from "../helpers/errors.js";
+import { fighterService } from "../services/fighterService.js";
 import { fightRepository } from "../repositories/fightRepository.js";
 
 class FightersService {
@@ -12,6 +13,17 @@ class FightersService {
   }
 
   createFight(fight) {
+    const fighter1 = fighterService.getFighter(fight.fighter1);
+    const fighter2 = fighterService.getFighter(fight.fighter2);
+
+    if (!fighter1 || !fighter2) {
+      throw new Error404("Fighter not found");
+    }
+
+    if (fight.log === undefined) {
+      fight.log = [];
+    }
+
     return fightRepository.create(fight);
   }
 
