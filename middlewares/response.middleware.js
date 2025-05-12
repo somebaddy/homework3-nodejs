@@ -1,7 +1,7 @@
 const responseMiddleware = (req, res, next) => {
-  // TODO: Implement middleware that returns result of the query
   if (res.err) {
-    next(res.err);
+    // TODO: probably never will be called but need additonal tests.
+    next(res.err); 
   } else {
     res.status(200).json(res.data);
     next();
