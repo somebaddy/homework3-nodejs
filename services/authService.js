@@ -3,7 +3,7 @@ import { userService } from "./userService.js";
 
 class AuthService {
   login(userData) {
-    const user = userService.search(userData);
+    const user = userService.search(it => it.email.toLowerCase() === userData.email.toLowerCase());
     if (!user) {
       throw new Error404("User not found");
     }
