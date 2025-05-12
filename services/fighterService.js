@@ -16,6 +16,11 @@ class FighterService {
     if (existingName) {
       throw new Error400("Fighter name already registered.")
     }
+    
+    if (fighter.health === undefined) {
+      fighter.health = 85;
+    }
+
     return fighterRepository.create(fighter);
   }
 
