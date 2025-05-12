@@ -9,25 +9,31 @@ const attributesValidators = {
   password: validatePassword
 };
 
-const validateRedundantFields = (body, model) => {
-  // Separate "id" validation due specification
-  validateNoIdFieldInBody(body);
+const noRedundantValidator = (model) => {
+  return (body) => {
+    // Separate "id" validation due specification
+    validateNoIdFieldInBody(body);
 
-  // According specification no extra data allowed and all field are required
-  const allowedFields = Object.keys(model).filter(key => key !== "id");
-  validateNoExtraFields(body, allowedFields);
+    // According specification no extra data allowed and all field are required
+    const allowedFields = Object.keys(model).filter(key => key !== "id");
+    validateNoExtraFields(body, allowedFields);
+  }
 }
 
-const validateUserAttibutes = (body, validators) => {
-  Object.entries(validators).forEach(([key, validator]) => {
-    if (body[key] !== undefined) validator(body[key]);
-  });
+const attributesValidator = (validators) => {
+  return (body) => {
+    Object.entries(validators).forEach(([key, validator]) => {
+      if (body[key] !== undefined) validator(body[key]);
+    });
+  }
 }
 
-const validateCompleteModel = (body, model) => {
-  // Completeness validation
-  const requiredFields = Object.keys(model).filter(key => key !== "id");
-  validateRequiredFields(body, requiredFields);
+const completeModelValidator = (model) => {
+  return (body) => {
+    // Completeness validation
+    const requiredFields = Object.keys(model).filter(key => key !== "id");
+    validateRequiredFields(body, requiredFields);
+  }
 }
 
 const validateNotEmptyBody = (body) => {
@@ -36,28 +42,27 @@ const validateNotEmptyBody = (body) => {
   }
 }
 
-const createUserValid = (req, res, next) => {
-  try {
-    validateRedundantFields(req.body, USER);
-    validateCompleteModel(req.body, USER);
-    validateUserAttibutes(req.body, attributesValidators);
-
-    next();
-  } catch (error) {
-    handleValidationError(error, res);
+const validationChain = (validators) => {
+  return (req, res, next) => {    
+    try {
+      validators.forEach((validator) => validator(req.body));    
+      next();
+    } catch (error) {
+      handleValidationError(error, res);
+    }
   }
-};
+}
 
-const updateUserValid = (req, res, next) => {
-  try {
-    validateRedundantFields(req.body, USER);
-    validateNotEmptyBody(req.body);
-    validateUserAttibutes(req.body, attributesValidators);
+const createUserValid = validationChain([
+  noRedundantValidator(USER),
+  completeModelValidator(USER),
+  attributesValidator(attributesValidators)
+]);
 
-    next();
-  } catch (error) {
-    handleValidationError(error, res);
-  }
-};
+const updateUserValid = validationChain([
+  noRedundantValidator(USER),
+  validateNotEmptyBody,
+  attributesValidator(attributesValidators)
+]);
 
 export { createUserValid, updateUserValid };
