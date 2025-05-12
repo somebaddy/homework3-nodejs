@@ -1,5 +1,4 @@
 import { ValidationError } from "../helpers/errors.js";
-import { handleValidationError } from "./helpers.js";
 
 
 const EMAIL_REGEX = /^[^\s@]+@gmail\.com$/;
@@ -103,7 +102,11 @@ const validationChain = (validators) => {
       validators.forEach((validator) => validator(req.body));    
       next();
     } catch (error) {
-      handleValidationError(error, res);
+      if (error instanceof ValidationError) {
+        next(error);
+      } else {
+        throw error; // We only care about validation errors. Let someone else take care of the other errors.
+      }
     }
   }
 }

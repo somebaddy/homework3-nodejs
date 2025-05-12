@@ -1,5 +1,3 @@
-import { setResponseError } from './helpers.js';
-
 const responseMiddleware = (req, res, next) => {
   // TODO: Implement middleware that returns result of the query
   if (res.err) {
@@ -11,7 +9,13 @@ const responseMiddleware = (req, res, next) => {
 };
 
 const responseErrorMiddleware = (err, req, res, next) => {
-  setResponseError(res, err);
+  let { message, code } = err;
+  code = code || 500;
+  message = message || "Unknown error. That's embarrassing."
+  res.status(code).json({
+    error: true,
+    message
+  });
   next();
 };
 
