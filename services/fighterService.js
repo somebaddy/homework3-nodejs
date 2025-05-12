@@ -16,7 +16,7 @@ class FighterService {
     if (existingName) {
       throw new Error400("Fighter name already registered.")
     }
-    
+
     if (fighter.health === undefined) {
       fighter.health = 85;
     }
@@ -25,6 +25,15 @@ class FighterService {
   }
 
   updateFighter(id, fighter) {
+    if (fighter.name !== undefined) {
+      // Try to update fighter name: check if any other fighter with new name already exists
+      const existingName = fighterRepository.getOne(it => it.name.toLowerCase() === fighter.name.toLowerCase());
+
+      if (existingName && existingName.id !== id) {
+        throw new Error400("Fighter name already registered.")
+      }
+    }
+
     const updatedFighter = fighterRepository.update(id, fighter);
     if (!updatedFighter || !updatedFighter.id) {
       throw new Error404("Fighter not found");
