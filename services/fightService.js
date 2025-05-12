@@ -1,7 +1,7 @@
 import { Error404 } from "../helpers/errors.js";
 import { fightRepository } from "../repositories/fightRepository.js";
 
-class FightsService {
+class FightersService {
   // OPTIONAL TODO: Implement methods to work with fights
   getFights() {
     return fightRepository.getAll();
@@ -24,6 +24,6 @@ class FightsService {
   }
 }
 
-const fightsService = new FightsService();
+const fightersService = new FightersService();
 
-export { fightsService };
+export { fightersService };
