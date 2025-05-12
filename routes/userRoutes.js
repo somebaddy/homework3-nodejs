@@ -14,7 +14,7 @@ router.get('/',
 , responseMiddleware);
 
 router.get('/:id', 
-  wrapRequest((req) => userService.getUser(req.params.id))
+  wrapRequest((req) => { userService.getUser(req.params.id) }, "User not found")
 , responseMiddleware);
 
 router.post('/', createUserValid,
