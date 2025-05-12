@@ -122,7 +122,7 @@ const validateNotEmptyBody = (body) => {
 /**
  * Creates a validator that ensures no redundant fields are present in the request body.
  * 
- * @param {Object} model - The model defining allowed fields.
+ * @param {Object|Array<string>} model - The model defining allowed fields (as an object or a list of field names).
  * @returns {Function} A validator function.
  */
 const noRedundantValidator = (model) => {
@@ -131,7 +131,10 @@ const noRedundantValidator = (model) => {
     validateNoIdFieldInBody(body);
 
     // According specification no extra data allowed and all field are required
-    const allowedFields = Object.keys(model).filter(key => key !== "id");
+    const allowedFields = Array.isArray(model)
+      ? model
+      : Object.keys(model).filter(key => key !== "id");
+      
     validateNoExtraFields(body, allowedFields);
   };
 };
