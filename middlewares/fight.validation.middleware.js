@@ -1,7 +1,11 @@
 import { ValidationError } from "../helpers/errors.js";
 import { FIGHT } from "../models/fight.js";
-import { handleValidationError } from "./helpers.js";
-import { validateNoExtraFields, validateNoIdFieldInBody, validateRequiredFields } from "./validators.js";
+import { 
+    noRedundantValidator, 
+    validateNoExtraFields, 
+    validateRequiredFields, 
+    validationChain 
+} from "./validators.js";
 
 const validateLogs = (log) => {
     if (!Array.isArray(log)) {
@@ -14,22 +18,15 @@ const validateLogs = (log) => {
     })
 }
 
-const createFightValid = (req, res, next) => {
-    try {
-        validateNoIdFieldInBody(req.body);
-
-        const allowedFields = Object.keys(FIGHT);
-        validateNoExtraFields(req.body, allowedFields);
-
-        const requiredFields = ["fighter1", "fighter2"];
-        validateRequiredFields(req.body, requiredFields);
-
-        if (req.body.log) validateLogs(req.body.log);
-
-        next();
-    } catch (error) {
-        handleValidationError(error, res);
+const createFightValid = validationChain([
+    // Ensure no extra fields and "id" is not included
+    noRedundantValidator(FIGHT),
+    // Ensure required fields are present
+    (body) => validateRequiredFields(body, ["fighter1", "fighter2"]),
+    // Validate specific attributes (logs)
+    (body) => {
+        if (body.log) validateLogs(body.log);
     }
-}
+]);
 
 export { createFightValid }
