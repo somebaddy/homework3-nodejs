@@ -10,18 +10,20 @@ const router = Router();
 
 router.get("/", 
   wrapRequest((req) => fightsService.getFights())
-, responseMiddleware);
+);
 
 router.get("/:id", 
   wrapRequest((req) => fightsService.getFight(req.params.id), "Fight not found.")
-, responseMiddleware);
+);
 
 router.post("/", createFightValid,
   wrapRequest((req) => fightsService.createFight(req.body))
-, responseMiddleware);
+);
 
 router.delete("/:id", 
   wrapRequest((req) => fightsService.deleteFight(req.params.id))
-, responseMiddleware); 
+); 
+
+router.use(responseMiddleware);
 
 export { router };

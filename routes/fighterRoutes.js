@@ -13,22 +13,26 @@ const router = Router();
 // TODO: Implement route controllers for fighter
 router.get("/", 
   wrapRequest((req) => fighterService.getFighters())
-, responseMiddleware);
+);
 
 router.get("/:id", 
   wrapRequest((req) => fighterService.getFighter(req.params.id), "Fighter not found.")
-, responseMiddleware);
+);
 
-router.post("/", createFighterValid, 
+router.post("/", 
+  createFighterValid, 
   wrapRequest((req) => fighterService.createFighter(req.body))
-, responseMiddleware);
+);
 
-router.patch("/:id", updateFighterValid,
+router.patch("/:id", 
+  updateFighterValid, 
   wrapRequest((req) => fighterService.updateFighter(req.params.id, req.body))
-, responseMiddleware);
+);
 
 router.delete("/:id", 
   wrapRequest((req) => fighterService.deleteFighter(req.params.id))
-, responseMiddleware);
+);
+
+router.use(responseMiddleware);
 
 export { router };

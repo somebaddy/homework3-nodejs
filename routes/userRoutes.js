@@ -11,22 +11,24 @@ const router = Router();
 
 router.get('/', 
   wrapRequest((req) => userService.getUsers())
-, responseMiddleware);
+);
 
 router.get('/:id', 
   wrapRequest((req) => userService.getUser(req.params.id), "User not found")
-, responseMiddleware);
+);
 
 router.post('/', createUserValid,
   wrapRequest((req) => userService.createUser(req.body))
-, responseMiddleware);
+);
 
 router.patch('/:id', updateUserValid,
   wrapRequest((req) => userService.updateUser(req.params.id, req.body))
-, responseMiddleware);
+);
 
 router.delete('/:id',
   wrapRequest((req) => userService.deleteUser(req.params.id))
-, responseMiddleware);
+);
+
+router.use(responseMiddleware);
 
 export { router };
