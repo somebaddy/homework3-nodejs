@@ -19,7 +19,8 @@ const validateRequiredFields = (body, requiredFields) => {
 }
 
 const validateNoExtraFields = (body, allowedFields) => {
-  const extraFields = Object.keys(body).filter(field => !allowedFields.includes(field));
+  const allowedFieldsSet = new Set(allowedFields);
+  const extraFields = Object.keys(body).filter(field => !allowedFieldsSet.has(field));
   if (extraFields.length > 0) {
     throw new ValidationError(`Unexpected fields '${extraFields.join("', '")}'`);
   }

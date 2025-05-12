@@ -3,26 +3,44 @@ import { USER } from "../models/user.js";
 import { validateEmail, validateNoExtraFields, validateNoIdFieldInBody, validatePassword, validatePhone, validateRequiredFields } from "./validators.js";
 import { handleValidationError } from "./helpers.js";
 
+const attributesValidators = {
+  email: validateEmail,
+  phone: validatePhone,
+  password: validatePassword
+};
+
+const validateRedundantFields = (body, model) => {
+  // Separate "id" validation due specification
+  validateNoIdFieldInBody(body);
+
+  // According specification no extra data allowed and all field are required
+  const allowedFields = Object.keys(model).filter(key => key !== "id");
+  validateNoExtraFields(body, allowedFields);
+}
+
+const validateUserAttibutes = (body, validators) => {
+  Object.entries(validators).forEach(([key, validator]) => {
+    if (body[key] !== undefined) validator(body[key]);
+  });
+}
+
+const validateCompleteModel = (body, model) => {
+  // Completeness validation
+  const requiredFields = Object.keys(model).filter(key => key !== "id");
+  validateRequiredFields(body, requiredFields);
+}
+
+const validateNotEmptyBody = (body) => {
+  if (Object.keys(body).length === 0) {
+    throw new ValidationError("The request body must include at least one valid field to update.")
+  }
+}
 
 const createUserValid = (req, res, next) => {
   try {
-    const { firstName, lastName, email, phone, password } = req.body;
-
-    // Separate "id" validation due specification
-    validateNoIdFieldInBody(req.body);
-
-    // Due specification no extra data allowed and all field are required
-    const allowedFields = Object.keys(USER).filter(key => key !== "id");
-    const requiredFields = allowedFields;
-
-    // Completeness validation
-    validateRequiredFields(req.body, requiredFields);
-    validateNoExtraFields(req.body, allowedFields);
-
-    // Attributes validation
-    validateEmail(email);
-    validatePhone(phone);
-    validatePassword(password);
+    validateRedundantFields(req.body, USER);
+    validateCompleteModel(req.body, USER);
+    validateUserAttibutes(req.body, attributesValidators);
 
     next();
   } catch (error) {
@@ -32,19 +50,9 @@ const createUserValid = (req, res, next) => {
 
 const updateUserValid = (req, res, next) => {
   try {
-    validateNoIdFieldInBody(req.body);
-
-    const allowedFields = Object.keys(USER).filter(key => key !== "id");
-    validateNoExtraFields(req.body, allowedFields);
-
-    const providedFields = Object.keys(req.body);
-    if (providedFields.length === 0) {
-      throw new ValidationError("The request body must include at least one valid field to update.")
-    }
-
-    if (req.body.email) validateEmail(req.body.email);
-    if (req.body.phone) validatePhone(req.body.phone);
-    if (req.body.password) validatePassword(req.body.password);
+    validateRedundantFields(req.body, USER);
+    validateNotEmptyBody(req.body);
+    validateUserAttibutes(req.body, attributesValidators);
 
     next();
   } catch (error) {
