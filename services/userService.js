@@ -26,6 +26,22 @@ class UserService {
   }
 
   updateUser(id, user) {
+    if (user.email !== undefined) {
+      // Try to update user email: need to check if any other user with this email already exists
+      const existingEmail = userRepository.getOne(it => it.email.toLowerCase() === user.email.toLowerCase());
+      if (existingEmail && existingEmail.id !== id) {
+        throw new Error400("User with this email already exists");
+      }
+    }
+
+    if (user.phone !== undefined) {
+      // Try to update user phone: need to check if any other users with this phone already exists
+      const existingPhone = userRepository.getOne({phone: user.phone});
+      if (existingPhone && existingPhone.id !== id) {
+        throw new Error400("User phone number already registered")
+      }
+    }
+
     const updatedUser = userRepository.update(id, user);
     if (!updatedUser || !updatedUser.id) {
       throw new Error404("User not found");
