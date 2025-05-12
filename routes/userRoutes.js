@@ -4,7 +4,7 @@ import {
   createUserValid,
   updateUserValid,
 } from "../middlewares/user.validation.middleware.js";
-import { responseMiddleware } from "../middlewares/response.middleware.js";
+import { responseErrorMiddleware, responseMiddleware } from "../middlewares/response.middleware.js";
 import { wrapRequest } from "./requestHelpers.js";
 
 const router = Router();
@@ -30,5 +30,6 @@ router.delete('/:id',
 );
 
 router.use(responseMiddleware);
+router.use(responseErrorMiddleware);
 
 export { router };

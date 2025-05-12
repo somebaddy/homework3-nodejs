@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { fighterService } from "../services/fighterService.js";
-import { responseMiddleware } from "../middlewares/response.middleware.js";
+import { responseErrorMiddleware, responseMiddleware } from "../middlewares/response.middleware.js";
 import {
   createFighterValid,
   updateFighterValid,
@@ -34,5 +34,6 @@ router.delete("/:id",
 );
 
 router.use(responseMiddleware);
+router.use(responseErrorMiddleware);
 
 export { router };
