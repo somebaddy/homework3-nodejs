@@ -10,7 +10,7 @@ import { wrapRequest } from "./requestHelpers.js";
 const router = Router();
 
 router.get('/', 
-  wrapRequest((req) => userService.getUsers())
+  wrapRequest(() => userService.getUsers())
 );
 
 router.get('/:id', 

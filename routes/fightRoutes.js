@@ -9,7 +9,7 @@ const router = Router();
 // OPTIONAL TODO: Implement route controller for fights
 
 router.get("/", 
-  wrapRequest((req) => fightersService.getFights())
+  wrapRequest(() => fightersService.getFights())
 );
 
 router.get("/:id", 

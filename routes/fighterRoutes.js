@@ -12,7 +12,7 @@ const router = Router();
 
 // TODO: Implement route controllers for fighter
 router.get("/", 
-  wrapRequest((req) => fighterService.getFighters())
+  wrapRequest(() => fighterService.getFighters())
 );
 
 router.get("/:id", 
