@@ -22,6 +22,9 @@ class UserService {
       throw new Error400("User phone number already registered")
     }
 
+    let userObj = user;
+    userObj.email = userObj.email.toLowerCase();
+
     return userRepository.create(user); 
   }
 
